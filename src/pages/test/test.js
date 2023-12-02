@@ -1,60 +1,74 @@
-import { Button, Form } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
+import { Question } from './components/question';
 
 export const Test = () => {
+	const [data, setData] = useState();
+	const [questionNumber, setQuestionNumber] = useState(0);
+
+	useEffect(() => {
+		fetch('/api/')
+			.then((res) => {
+				if (res.ok) {
+					return res;
+				}
+				const error =
+					res.status === 404
+						? 'Такая страница не существует'
+						: 'Что-то пошло не так.';
+				return Promise.reject(error);
+			})
+			.then((res) => res.json())
+			.then(([res]) => res & setData(res));
+	}, []);
+
+	if (!data) {
+		return <h1>Loading...</h1>;
+	}
+
+	const previousQuestion = () => {
+		console.log('Previous');
+		setQuestionNumber((prev) => prev - 1);
+	};
+
+	const nextQuestion = () => {
+		setQuestionNumber((prev) => prev + 1);
+	};
+
+	const completeTest = () => {
+		console.log('Тест завершен');
+	};
+
+	const lastQuestion = !(data.questions.length === questionNumber + 1) ? true : false;
+
 	return (
 		<div className="text-center">
 			<h1 className="mb-5">Прохождение теста</h1>
-			<div className="mb-1">Вопрос 1 из 10</div>
-			<div className="mb-5 fs-3 fw-bold">React - это ... ?</div>
-			<Form
-				className="d-flex flex-column align-items-start m-auto"
-				style={{ maxWidth: 400 }}
-			>
-				<Form.Check
-					className="mb-3"
-					type="radio"
-					name="answer"
-					label="библиотека"
-					id="id-1"
-				/>
-				<Form.Check
-					className="mb-3"
-					type="radio"
-					name="answer"
-					label="фреймворк"
-					id="id-2"
-				/>
-				<Form.Check
-					className="mb-3"
-					type="radio"
-					name="answer"
-					label="приложение"
-					id="id-3"
-				/>
-				<Form.Check
-					className="mb-3"
-					type="radio"
-					name="answer"
-					label="не знаю"
-					id="id-4"
-				/>
-			</Form>
-
+			<Question data={data} questionsNum={questionNumber} />
 			<div className="my-5">
-				<Button variant="outline-primary disabled" className="me-3">
+				<Button
+					className="btn btn-primary "
+					onClick={() => previousQuestion()}
+					disabled={!questionNumber ? true : false}
+				>
 					Предыдущий вопрос
 				</Button>
-				<Button variant="outline-primary disabled">Следующий вопрос</Button>
+				{lastQuestion ? (
+					<Button
+						className="btn btn-primary nextBtn mx-3"
+						onClick={() => nextQuestion()}
+					>
+						Следующий вопрос
+					</Button>
+				) : (
+					<Button
+						className="btn btn-primary mx-3"
+						onClick={() => completeTest()}
+					>
+						Завершить тест
+					</Button>
+				)}
 			</div>
-
-			{/* <h1 className="mb-5">Правильных ответов:</h1>
-			<div className="mb-1 fs-3 fw-semibold text-success">8 из 10</div>
-			<div className="my-5">
-				<Button variant="primary" className="me-3">
-					На главную
-				</Button>
-				<Button variant="primary">Пройти еще раз</Button>
-			</div> */}
 		</div>
 	);
 };

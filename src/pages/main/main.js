@@ -1,27 +1,25 @@
-import { useEffect, useState } from 'react';
 import { Button, ProgressBar } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 export const Main = () => {
-	const [data, setData] = useState(null);
+	const navigate = useNavigate();
 
-	useEffect(() => {
-		fetch('/api/').then(async (res) => setData(await res.json()));
-	}, []);
-
-	console.log(data);
 	return (
 		<div className="text-center">
 			<h1 className="mb-5">Главная страница</h1>
 			<div className="buttons"></div>
 			<div className="mb-5">
-				<Button variant="outline-primary" className="me-3">
+				<Button
+					variant="outline-primary"
+					className="me-3"
+					onClick={() => navigate('/test')}
+				>
 					Запустить тест
 				</Button>
 				<Button variant="outline-primary">Редактировать тест</Button>
 			</div>
 			<div>
 				<h4 className="mb-3 text-start">История прохождений</h4>
-				<p>{!data ? 'Loading...' : `${data[0]}`}</p>
 				<div>
 					<div className="d-flex justify-content-between align-items-center gap-4 px-3 py-1 border border-info rounded">
 						<div className="date">
