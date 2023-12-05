@@ -1,8 +1,10 @@
 import { Button, ProgressBar } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { amountOfCorrect, formatTimestamp, percentageOfCorrect } from '../../utils';
 
 export const Main = () => {
 	const navigate = useNavigate();
+	const history = JSON.parse(localStorage.getItem('results')) || [];
 
 	return (
 		<div className="text-center">
@@ -16,24 +18,37 @@ export const Main = () => {
 				>
 					Запустить тест
 				</Button>
-				<Button variant="outline-primary">Редактировать тест</Button>
+				<Link to="/test-edit">
+					<Button variant="outline-primary">Редактировать тест</Button>
+				</Link>
 			</div>
 			<div>
 				<h4 className="mb-3 text-start">История прохождений</h4>
-				<div>
-					<div className="d-flex justify-content-between align-items-center gap-4 px-3 py-1 border border-info rounded">
-						<div className="date">
-							<div className="date-top">01.01.2024</div>
-							<div className="date-bottom">16:46:37</div>
+				{history.map(({ timestamp, progress }) => (
+					<div key={timestamp} className="mb-3">
+						<div className="d-flex justify-content-between align-items-center gap-4 px-3 py-1 border border-info rounded">
+							<div className="date">
+								<div className="date-top">
+									{formatTimestamp(timestamp).formattedDate}
+								</div>
+								<div className="date-bottom">
+									{formatTimestamp(timestamp).formattedTime}
+								</div>
+							</div>
+							<div className="d-flex align-items-center flex-grow-1">
+								<span>0</span>
+								<ProgressBar
+									now={percentageOfCorrect(progress)}
+									className="flex-grow-1 mx-2"
+								/>
+								<span>{progress.length}</span>
+							</div>
+							<div>
+								Верно: {amountOfCorrect(progress)} из {progress.length}
+							</div>
 						</div>
-						<div className="d-flex align-items-center flex-grow-1">
-							<span>0</span>
-							<ProgressBar now={50} className="flex-grow-1 mx-2" />
-							<span>10</span>
-						</div>
-						<div>Верно: 5 из 10</div>
 					</div>
-				</div>
+				))}
 			</div>
 		</div>
 	);

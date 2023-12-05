@@ -1,29 +1,36 @@
+import { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 
 export const Question = ({
 	data,
 	questionNumber,
+	questionsLength,
 	value,
 	setValue,
-	setIsChecked,
-	setTesting,
-	questionsLength,
 	testing,
+	setTesting,
 }) => {
 	const questionTitle = data.questions[questionNumber].title;
 	const questionAnswers = data.questions[questionNumber].answers;
 
-	function chengeValue(event) {
-		setValue(event.target.value);
-		setIsChecked(true);
+	function changeValue({ target }) {
+		setValue(target.value);
 		setTesting((prev) => {
 			return {
 				...prev,
-				[questionTitle]: event.target.value,
+				[questionTitle]: target.value,
 			};
 		});
-		console.log(testing);
 	}
+
+	useEffect(() => {
+		if (testing[questionTitle]) {
+			setValue(testing[questionTitle]);
+			return;
+		}
+
+		setValue('');
+	}, [questionNumber, questionTitle, setValue, testing]);
 
 	return (
 		<>
@@ -38,14 +45,14 @@ export const Question = ({
 				{questionAnswers.map((answer, index) => (
 					<Form.Check
 						key={answer.title}
-						className=" mb-3"
+						className="mb-3"
 						type="radio"
 						name="flexRadioDefault"
 						id={`flexRadioDefault${index}`}
 						label={answer.title}
 						value={answer.title}
 						checked={value === answer.title ? true : false}
-						onChange={(e) => chengeValue(e)}
+						onChange={changeValue}
 					/>
 				))}
 			</Form>

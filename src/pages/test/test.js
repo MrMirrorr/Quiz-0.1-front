@@ -1,58 +1,65 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { Question } from './components/question';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { amountOfCorrect, generateProgress, rewriteLocalStorage } from '../../utils';
+import { useGetTest } from '../../hooks';
 
 export const Test = () => {
-	const [data, setData] = useState();
-	const [value, setValue] = useState();
-	const [testing, setTesting] = useState({});
-	const [isChecked, setIsChecked] = useState(false);
+	const data = useGetTest();
 	const [questionNumber, setQuestionNumber] = useState(0);
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		fetch('/api/')
-			.then((res) => {
-				if (res.ok) {
-					return res;
-				}
-				const error =
-					res.status === 404
-						? 'Такая страница не существует'
-						: 'Что-то пошло не так.';
-				return Promise.reject(error);
-			})
-			.then((res) => res.json())
-			.then(([res]) => res & setData(res));
-	}, []);
+	const [value, setValue] = useState('');
+	const [testing, setTesting] = useState({});
+	const [results, setResults] = useState([]);
 
 	if (!data) {
-		return <h1>Loading...</h1>;
+		return <h1 className="text-center">Loading...</h1>;
 	}
-
+	console.log(data);
 	const questionsLength = data.questions.length;
+	const firstQuestion = questionNumber === 0 ? true : false;
+	const lastQuestion = questionNumber === questionsLength - 1 ? true : false;
 
 	const previousQuestion = () => {
 		setQuestionNumber((prev) => prev - 1);
-		setIsChecked(false);
 	};
 
 	const nextQuestion = () => {
 		setQuestionNumber((prev) => prev + 1);
-		setIsChecked(false);
-		console.log(testing);
 	};
 
 	const completeTest = () => {
-		localStorage.setItem(`${Date.now()}`, JSON.stringify(testing));
-		navigate('/');
-		console.log('Тест завершен');
+		const progress = generateProgress(data, testing);
+		setResults(progress);
+		rewriteLocalStorage(progress);
 	};
 
-	const lastQuestion = !(questionsLength === questionNumber + 1) ? true : false;
+	const resetTest = () => {
+		setQuestionNumber(0);
+		setValue('');
+		setTesting({});
+		setResults([]);
+	};
 
-	return (
+	return results.length ? (
+		<div className="text-center">
+			<h1 className="mb-5">Правильных ответов:</h1>
+			<div className="fs-2 text-success">
+				{amountOfCorrect(results)} из {questionsLength}
+			</div>
+
+			<div className="my-5">
+				<Link to="/">
+					<Button variant="outline-primary" className="me-3">
+						На главную
+					</Button>
+				</Link>
+				<Button variant="outline-success" onClick={() => resetTest()}>
+					Пройти еще раз
+				</Button>
+			</div>
+		</div>
+	) : (
 		<div className="text-center">
 			<h1 className="mb-5">Прохождение теста</h1>
 			<Question
@@ -60,31 +67,31 @@ export const Test = () => {
 				questionNumber={questionNumber}
 				value={value}
 				setValue={setValue}
-				setIsChecked={setIsChecked}
 				setTesting={setTesting}
 				testing={testing}
 				questionsLength={questionsLength}
 			/>
 			<div className="my-5">
 				<Button
-					className="btn btn-primary "
-					disabled={!questionNumber || !isChecked ? true : false}
+					variant="primary"
+					className="me-3"
+					disabled={firstQuestion}
 					onClick={() => previousQuestion()}
 				>
 					Предыдущий вопрос
 				</Button>
-				{lastQuestion ? (
+				{!lastQuestion ? (
 					<Button
-						className="btn btn-primary nextBtn mx-3"
-						disabled={!isChecked}
+						variant="primary"
+						disabled={!value}
 						onClick={() => nextQuestion()}
 					>
 						Следующий вопрос
 					</Button>
 				) : (
 					<Button
-						className="btn btn-primary mx-3"
-						disabled={!isChecked}
+						variant="success"
+						disabled={!value}
 						onClick={() => completeTest()}
 					>
 						Завершить тест
