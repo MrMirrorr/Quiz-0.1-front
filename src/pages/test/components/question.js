@@ -45,7 +45,7 @@ export const Question = ({
 				{questionAnswers.map((answer, index) => (
 					<Form.Check
 						key={answer.title}
-						className="mb-3"
+						className="mb-3 text-start"
 						type="radio"
 						name="flexRadioDefault"
 						id={`flexRadioDefault${index}`}

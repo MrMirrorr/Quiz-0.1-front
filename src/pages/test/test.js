@@ -15,7 +15,7 @@ export const Test = () => {
 	if (!data) {
 		return <h1 className="text-center">Loading...</h1>;
 	}
-	console.log(data);
+
 	const questionsLength = data.questions.length;
 	const firstQuestion = questionNumber === 0 ? true : false;
 	const lastQuestion = questionNumber === questionsLength - 1 ? true : false;
