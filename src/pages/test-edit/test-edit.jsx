@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { useGetTest } from '../../hooks';
-import { Question } from './components';
-import { generateId } from './utils';
-import { updateTest } from '../../api';
+import { Question } from '../../components';
+import { generateId } from '../../utils';
+import { updateTestRequest } from '../../api';
 
 export const TestEdit = () => {
 	const navigate = useNavigate();
-	const data = useGetTest();
 	const [tempData, setTempData] = useState(null);
+
+	const data = null;
 
 	useEffect(() => {
 		if (data) {
@@ -46,7 +46,7 @@ export const TestEdit = () => {
 	};
 
 	const handleClickUpdateTest = (testId, body) => {
-		updateTest(testId, body).then((data) => navigate('/'));
+		updateTestRequest(testId, body).then((data) => navigate('/'));
 	};
 
 	if (!data) {

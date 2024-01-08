@@ -3,14 +3,14 @@ import { Button } from 'react-bootstrap';
 import { Question } from './components/question';
 import { Link } from 'react-router-dom';
 import { amountOfCorrect, generateProgress, rewriteLocalStorage } from '../../utils';
-import { useGetTest } from '../../hooks';
 
-export const Test = () => {
-	const data = useGetTest();
+export const Testing = () => {
 	const [questionNumber, setQuestionNumber] = useState(0);
 	const [value, setValue] = useState('');
 	const [testing, setTesting] = useState({});
 	const [results, setResults] = useState([]);
+
+	const data = null;
 
 	if (!data) {
 		return <h1 className="text-center">Loading...</h1>;

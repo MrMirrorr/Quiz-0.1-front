@@ -1,1 +1,3 @@
-export * from './use-get-test';
+export * from './useAuth';
+export * from './useError';
+export * from './useTests';
